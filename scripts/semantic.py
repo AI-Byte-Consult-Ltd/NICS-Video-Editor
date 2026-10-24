@@ -5,13 +5,13 @@ text tower is English-trained, so matching against non-English prompts is
 weaker and treated as a secondary signal, never the sole basis for a decision."""
 import os
 
-os.environ.setdefault("HF_HOME", r"D:\NICS-VIDEO\models\hf_cache")
+from config import CLIP_MODEL_DIR, MODELS_DIR
+
+os.environ.setdefault("HF_HOME", os.path.join(MODELS_DIR, "hf_cache"))
 
 import cv2
 import torch
 import open_clip
-
-from config import CLIP_MODEL_DIR
 
 TAG_VOCAB = [
     "beach", "ocean", "swimming", "boat", "mountain", "forest", "jungle",

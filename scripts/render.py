@@ -11,7 +11,8 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from config import FFMPEG, OUTPUT_DIR, LOGS_DIR, CAPTION_FONT, CAPTION_FONT_PLAIN, today_output_dir
+from config import (FFMPEG, OUTPUT_DIR, LOGS_DIR, CAPTION_FONT, CAPTION_FONT_PLAIN, TITLE_FONT_PLAIN,
+                    KICKER_FONT_PLAIN, ff_font_path, today_output_dir)
 import subprocess
 from PIL import Image, ImageDraw, ImageFont
 
@@ -31,10 +32,8 @@ TRANSITION_DURATION = 0.35
 # bold color fill with a double outline, plus a small script-font "studio"
 # wordmark). Font paths need two forms: colon-escaped for ffmpeg drawtext
 # filter strings, plain for PIL (used only to measure text width for wrap).
-TITLE_FONT_FF = r"C\:/Windows/Fonts/comicbd.ttf"
-TITLE_FONT_PLAIN = r"C:/Windows/Fonts/comicbd.ttf"
-KICKER_FONT_FF = r"C\:/Windows/Fonts/segoescb.ttf"
-KICKER_FONT_PLAIN = r"C:/Windows/Fonts/segoescb.ttf"
+TITLE_FONT_FF = ff_font_path(TITLE_FONT_PLAIN)
+KICKER_FONT_FF = ff_font_path(KICKER_FONT_PLAIN)
 TITLE_FILL_COLOR = "#FFD400"
 TITLE_OUTLINE_COLOR = "#D1282D"
 
