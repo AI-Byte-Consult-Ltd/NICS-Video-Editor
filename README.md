@@ -167,7 +167,7 @@
 - `scripts/worker.py` — цикл: `claim` → скачать исходники частями по 3 МБ → `pipeline.run_job` → загрузить результаты частями → `complete`/`fail`. API — webhooks n8n (`nics-video-worker*`), контракт описан в начале файла.
 - Пути и шрифты настраиваются переменными окружения: `NICS_VIDEO_ROOT` (по умолчанию `D:\NICS-VIDEO` на Windows и `~/nics-video` на Linux), `NICS_VIDEO_CAPTION_FONT`, `NICS_VIDEO_TITLE_FONT`, `NICS_VIDEO_KICKER_FONT`. На Linux вместо шрифтов Windows используется DejaVu.
 
-**На рабочей станции (Windows):** создать `scripts\worker.env` со строкой `NICS_VIDEO_WORKER_TOKEN=...` (тот же токен сохраняется в n8n через форму `nics-video-set-worker-token`), запустить `scripts\start_worker.bat`. Адрес API по умолчанию `https://n8n.aibyteconsult.com/webhook`, другой задаётся через `NICS_VIDEO_API_BASE`.
+**На рабочей станции (Windows):** один раз запустить `scripts\setup_worker.bat`: он создаст `scripts\worker.env` со случайным токеном и покажет его. Этот токен вставить в форму n8n https://n8n.aibyteconsult.com/form/nics-video-settings (поле Worker token). Затем запустить `scripts\start_worker.bat`; чтобы воркер стартовал вместе с Windows, положить ярлык на него в папку `shell:startup`. Адрес API по умолчанию `https://n8n.aibyteconsult.com/webhook`, другой задаётся через `NICS_VIDEO_API_BASE`.
 
 **На сервере (Linux):**
 
