@@ -1,0 +1,10 @@
+venv/
+models/
+input/
+output/
+analysis/
+jobs/
+logs/
+work/
+assets/
+.git/

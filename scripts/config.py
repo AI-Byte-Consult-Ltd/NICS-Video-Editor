@@ -6,29 +6,53 @@ import os
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
-ROOT = r"D:\NICS-VIDEO"
+REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IS_WINDOWS = os.name == "nt"
+
+# Data root (input/output/models/cache). Override with NICS_VIDEO_ROOT; the
+# default keeps the original workstation layout on Windows.
+ROOT = os.environ.get("NICS_VIDEO_ROOT") or (r"D:\NICS-VIDEO" if IS_WINDOWS else os.path.expanduser("~/nics-video"))
 INPUT_DIR = os.path.join(ROOT, "input")
 OUTPUT_DIR = os.path.join(ROOT, "output")
 ASSETS_DIR = os.path.join(ROOT, "assets")
 JOBS_DIR = os.path.join(ROOT, "jobs")
 ANALYSIS_DIR = os.path.join(ROOT, "analysis")
-MODELS_DIR = os.path.join(ROOT, "models")
-PRESETS_DIR = os.path.join(ROOT, "presets")
+MODELS_DIR = os.environ.get("NICS_VIDEO_MODELS_DIR") or os.path.join(ROOT, "models")
+PRESETS_DIR = os.environ.get("NICS_VIDEO_PRESETS_DIR") or os.path.join(REPO_DIR, "presets")
 LOGS_DIR = os.path.join(ROOT, "logs")
 
 CLIP_MODEL_DIR = os.path.join(MODELS_DIR, "clip")
 WHISPER_MODEL_DIR = os.path.join(MODELS_DIR, "whisper")
 LLM_MODEL_PATH = os.path.join(MODELS_DIR, "llm", "qwen2.5-1.5b-instruct-q4_k_m.gguf")
 
-FFMPEG = "ffmpeg"
-FFPROBE = "ffprobe"
+FFMPEG = os.environ.get("NICS_VIDEO_FFMPEG", "ffmpeg")
+FFPROBE = os.environ.get("NICS_VIDEO_FFPROBE", "ffprobe")
 
-CAPTION_FONT = r"C\:/Windows/Fonts/arialbd.ttf"
-CAPTION_FONT_PLAIN = r"C:/Windows/Fonts/arialbd.ttf"
+
+def ff_font_path(path):
+    """Font path in the colon-escaped form ffmpeg drawtext expects."""
+    return path.replace("\\", "/").replace(":", "\\:")
+
+
+def _font(env_name, windows_name, linux_path):
+    if os.environ.get(env_name):
+        return os.environ[env_name]
+    return f"C:/Windows/Fonts/{windows_name}" if IS_WINDOWS else linux_path
+
+
+# Plain paths (PIL); ffmpeg drawtext uses ff_font_path(). On Linux the
+# Windows fonts are replaced by DejaVu (fonts-dejavu-core) unless overridden.
+CAPTION_FONT_PLAIN = _font("NICS_VIDEO_CAPTION_FONT", "arialbd.ttf",
+                           "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
+TITLE_FONT_PLAIN = _font("NICS_VIDEO_TITLE_FONT", "comicbd.ttf",
+                         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
+KICKER_FONT_PLAIN = _font("NICS_VIDEO_KICKER_FONT", "segoescb.ttf",
+                          "/usr/share/fonts/truetype/dejavu/DejaVuSerif-BoldItalic.ttf")
+CAPTION_FONT = ff_font_path(CAPTION_FONT_PLAIN)
 
 SUPPORTED_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".m4v", ".3gp"}
 
-for _d in (INPUT_DIR, OUTPUT_DIR, ASSETS_DIR, JOBS_DIR, ANALYSIS_DIR, MODELS_DIR, PRESETS_DIR, LOGS_DIR):
+for _d in (INPUT_DIR, OUTPUT_DIR, ASSETS_DIR, JOBS_DIR, ANALYSIS_DIR, MODELS_DIR, LOGS_DIR):
     os.makedirs(_d, exist_ok=True)
 
 _MONTHS_RU_GENITIVE = {

@@ -22,3 +22,7 @@ assets/
 Thumbs.db
 .vscode/
 .idea/
+
+# Worker secrets
+scripts/worker.env
+work/
