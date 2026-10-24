@@ -1,0 +1,90 @@
+{
+  "dynamic": {
+    "label_ru": "динамичный",
+    "clip_len_range": [0.8, 2.5],
+    "transition": "cut",
+    "transition_every_n": 4,
+    "transition_type_alt": "fade",
+    "caption_frequency": "high",
+    "intro_weight": 1.3,
+    "music_db": -14,
+    "orig_audio_db": -24
+  },
+  "cinematic": {
+    "label_ru": "кинематографичный",
+    "clip_len_range": [2.0, 5.0],
+    "transition": "fade",
+    "transition_every_n": 1,
+    "transition_type_alt": "cut",
+    "caption_frequency": "low",
+    "intro_weight": 1.1,
+    "music_db": -16,
+    "orig_audio_db": -20
+  },
+  "atmospheric": {
+    "label_ru": "атмосферный",
+    "clip_len_range": [2.5, 6.0],
+    "transition": "fade",
+    "transition_every_n": 1,
+    "transition_type_alt": "fade",
+    "caption_frequency": "low",
+    "intro_weight": 1.0,
+    "music_db": -13,
+    "orig_audio_db": -26
+  },
+  "travel": {
+    "label_ru": "тревел",
+    "clip_len_range": [1.2, 3.5],
+    "transition": "cut",
+    "transition_every_n": 3,
+    "transition_type_alt": "fade",
+    "caption_frequency": "medium",
+    "intro_weight": 1.2,
+    "music_db": -14,
+    "orig_audio_db": -22
+  },
+  "documentary": {
+    "label_ru": "документальный",
+    "clip_len_range": [2.5, 7.0],
+    "transition": "cut",
+    "transition_every_n": 1,
+    "transition_type_alt": "cut",
+    "caption_frequency": "low",
+    "intro_weight": 1.0,
+    "music_db": -18,
+    "orig_audio_db": -12
+  },
+  "emotional": {
+    "label_ru": "эмоциональный",
+    "clip_len_range": [2.0, 5.0],
+    "transition": "fade",
+    "transition_every_n": 1,
+    "transition_type_alt": "fade",
+    "caption_frequency": "medium",
+    "intro_weight": 1.1,
+    "music_db": -13,
+    "orig_audio_db": -24
+  },
+  "minimalistic": {
+    "label_ru": "минималистичный",
+    "clip_len_range": [2.5, 6.0],
+    "transition": "cut",
+    "transition_every_n": 1,
+    "transition_type_alt": "cut",
+    "caption_frequency": "very_low",
+    "intro_weight": 1.0,
+    "music_db": -16,
+    "orig_audio_db": -24
+  },
+  "default": {
+    "label_ru": "универсальный",
+    "clip_len_range": [1.2, 3.5],
+    "transition": "cut",
+    "transition_every_n": 3,
+    "transition_type_alt": "fade",
+    "caption_frequency": "medium",
+    "intro_weight": 1.2,
+    "music_db": -14,
+    "orig_audio_db": -22
+  }
+}
