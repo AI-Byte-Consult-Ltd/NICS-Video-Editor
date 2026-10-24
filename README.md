@@ -164,16 +164,16 @@
 Сайт кладёт задачу и исходники в хранилище, а воркер забирает их по HTTPS, монтирует и отдаёт 6 файлов обратно. Входящих подключений воркеру не нужно, поэтому он работает и на рабочей станции, и на сервере.
 
 - `scripts/pipeline.py` — одна полная задача (лонг 16:9, шортс 9:16, 4 обложки RU/EN), то же, что `make_video.bat`, но вызывается из Python.
-- `scripts/worker.py` — цикл: `claim` → скачать исходники → `pipeline.run_job` → загрузить результаты → `complete`/`fail`. Контракт API описан в начале файла.
+- `scripts/worker.py` — цикл: `claim` → скачать исходники частями по 8 МБ → `pipeline.run_job` → загрузить результаты частями → `complete`/`fail`. API — webhooks n8n (`nics-video-worker*`), контракт описан в начале файла.
 - Пути и шрифты настраиваются переменными окружения: `NICS_VIDEO_ROOT` (по умолчанию `D:\NICS-VIDEO` на Windows и `~/nics-video` на Linux), `NICS_VIDEO_CAPTION_FONT`, `NICS_VIDEO_TITLE_FONT`, `NICS_VIDEO_KICKER_FONT`. На Linux вместо шрифтов Windows используется DejaVu.
 
-**На рабочей станции (Windows):** создать `scripts\worker.env` с `NICS_VIDEO_API_URL` и `NICS_VIDEO_WORKER_TOKEN`, запустить `scripts\start_worker.bat`.
+**На рабочей станции (Windows):** создать `scripts\worker.env` со строкой `NICS_VIDEO_WORKER_TOKEN=...` (тот же токен сохраняется в n8n через форму `nics-video-set-worker-token`), запустить `scripts\start_worker.bat`. Адрес API по умолчанию `https://n8n.aibyteconsult.com/webhook`, другой задаётся через `NICS_VIDEO_API_BASE`.
 
 **На сервере (Linux):**
 
 ```
 docker build -t nics-video-worker .
 docker run -d --restart unless-stopped --name nics-video-worker \
-  -e NICS_VIDEO_API_URL=... -e NICS_VIDEO_WORKER_TOKEN=... \
+  -e NICS_VIDEO_WORKER_TOKEN=... \
   -v nics-video-data:/data nics-video-worker
 ```
