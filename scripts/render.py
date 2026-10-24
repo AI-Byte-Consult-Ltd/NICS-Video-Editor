@@ -12,6 +12,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 
 from config import (FFMPEG, OUTPUT_DIR, LOGS_DIR, CAPTION_FONT, CAPTION_FONT_PLAIN, TITLE_FONT_PLAIN,
+                    has_arabic, title_font_for,
                     KICKER_FONT_PLAIN, ff_font_path, today_output_dir)
 import subprocess
 from PIL import Image, ImageDraw, ImageFont
@@ -32,7 +33,6 @@ TRANSITION_DURATION = 0.35
 # bold color fill with a double outline, plus a small script-font "studio"
 # wordmark). Font paths need two forms: colon-escaped for ffmpeg drawtext
 # filter strings, plain for PIL (used only to measure text width for wrap).
-TITLE_FONT_FF = ff_font_path(TITLE_FONT_PLAIN)
 KICKER_FONT_FF = ff_font_path(KICKER_FONT_PLAIN)
 TITLE_FILL_COLOR = "#FFD400"
 TITLE_OUTLINE_COLOR = "#D1282D"
@@ -192,8 +192,13 @@ def generate_title_image(plan, title_text, title_subtitle=None, output_path=None
     # and 0.30 wasn't enough clearance — bumped to 0.34 (+4% of height).
     bottom_margin = round(height * (0.34 if is_vertical else 0.08))
 
+    # The title is the client's own text in any site language: pick a font
+    # with its script, and set Arabic right-aligned (drawtext shapes it).
+    title_font = title_font_for(title_text)
+    title_font_ff = ff_font_path(title_font)
+    title_x = f"w-tw-{left_x}" if has_arabic(title_text) else str(left_x)
     title_lines = _safe_wrap(title_text, width, title_fontsize, max_lines=4, safe_margin=0.88,
-                              font_path=TITLE_FONT_PLAIN)
+                              font_path=title_font)
     sub_lines = _safe_wrap(title_subtitle, width, sub_fontsize, max_lines=1, safe_margin=0.88,
                             font_path=TITLE_FONT_PLAIN) if title_subtitle else []
 
@@ -228,19 +233,19 @@ def generate_title_image(plan, title_text, title_subtitle=None, output_path=None
         y = line_ys[li]
         lab1, lab2, lab3 = f"t{li}o1", f"t{li}o2", f"t{li}o3"
         filter_parts.append(
-            f"[{video_label}]drawtext=fontfile='{TITLE_FONT_FF}':text='{line_esc}':"
+            f"[{video_label}]drawtext=fontfile='{title_font_ff}':text='{line_esc}':"
             f"fontsize={title_fontsize}:fontcolor={TITLE_OUTLINE_COLOR}:borderw=13:"
-            f"bordercolor={TITLE_OUTLINE_COLOR}:x={left_x}:y={y}[{lab1}]"
+            f"bordercolor={TITLE_OUTLINE_COLOR}:x={title_x}:y={y}[{lab1}]"
         )
         filter_parts.append(
-            f"[{lab1}]drawtext=fontfile='{TITLE_FONT_FF}':text='{line_esc}':"
+            f"[{lab1}]drawtext=fontfile='{title_font_ff}':text='{line_esc}':"
             f"fontsize={title_fontsize}:fontcolor=white:borderw=7:bordercolor=white:"
-            f"x={left_x}:y={y}[{lab2}]"
+            f"x={title_x}:y={y}[{lab2}]"
         )
         filter_parts.append(
-            f"[{lab2}]drawtext=fontfile='{TITLE_FONT_FF}':text='{line_esc}':"
+            f"[{lab2}]drawtext=fontfile='{title_font_ff}':text='{line_esc}':"
             f"fontsize={title_fontsize}:fontcolor={TITLE_FILL_COLOR}:borderw=2:"
-            f"bordercolor=black@0.35:x={left_x}:y={y}[{lab3}]"
+            f"bordercolor=black@0.35:x={title_x}:y={y}[{lab3}]"
         )
         video_label = lab3
 
