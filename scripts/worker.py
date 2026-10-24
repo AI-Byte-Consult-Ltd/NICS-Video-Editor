@@ -4,11 +4,13 @@ the workstation or on a server.
 
 All calls go to NICS_VIDEO_API_BASE (the n8n webhook base URL) with
 "Authorization: Bearer $NICS_VIDEO_WORKER_TOKEN". Files travel in parts of at
-most PART_SIZE bytes, so no single request exceeds the webhook body limit.
+most PART_SIZE (3 MB) bytes, so no single request exceeds the webhook body limit.
   POST nics-video-worker {"action": "claim"}
        -> {"job": null} or {"job": {"id", "name", "title", "title_en", "long_duration",
            "short_duration", "inputs": [{"index", "filename", "parts"}]}}
   POST nics-video-worker {"action": "progress", "job_id", "stage"}
+  POST nics-video-worker {"action": "heartbeat", "job_id"}   (every few minutes; a job with no
+       sign of life for 30 minutes is handed out again)
   POST nics-video-worker {"action": "complete", "job_id", "files": [{"name", "size", "parts"}]}
   POST nics-video-worker {"action": "fail", "job_id", "error"}
   GET  nics-video-worker-file?job=ID&file=INDEX&part=N      -> raw bytes of one input part
@@ -23,6 +25,7 @@ import os
 import re
 import shutil
 import sys
+import threading
 import time
 import traceback
 
@@ -40,7 +43,8 @@ import pipeline
 API_BASE = os.environ.get("NICS_VIDEO_API_BASE", "https://n8n.aibyteconsult.com/webhook").rstrip("/")
 TOKEN = os.environ.get("NICS_VIDEO_WORKER_TOKEN", "")
 POLL_SECONDS = float(os.environ.get("NICS_VIDEO_POLL_SECONDS", "15"))
-PART_SIZE = 8 * 1024 * 1024
+HEARTBEAT_SECONDS = 300
+PART_SIZE = 3 * 1024 * 1024
 WORK_DIR = os.path.join(ROOT, "work")
 
 
@@ -101,6 +105,16 @@ def handle(job):
     input_dir = os.path.join(job_dir, "input")
     output_dir = os.path.join(job_dir, "output")
     os.makedirs(input_dir, exist_ok=True)
+    alive = threading.Event()
+
+    def heartbeat():
+        while not alive.wait(HEARTBEAT_SECONDS):
+            try:
+                call("heartbeat", job_id=job_id)
+            except Exception as e:
+                print(f"heartbeat failed: {e}", flush=True)
+
+    threading.Thread(target=heartbeat, daemon=True).start()
     try:
         call("progress", job_id=job_id, stage="download")
         for item in job.get("inputs", []):
@@ -128,6 +142,7 @@ def handle(job):
         except Exception:
             traceback.print_exc()
     finally:
+        alive.set()
         shutil.rmtree(job_dir, ignore_errors=True)
 
 
