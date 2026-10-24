@@ -50,6 +50,28 @@ KICKER_FONT_PLAIN = _font("NICS_VIDEO_KICKER_FONT", "segoescb.ttf",
                           "/usr/share/fonts/truetype/dejavu/DejaVuSerif-BoldItalic.ttf")
 CAPTION_FONT = ff_font_path(CAPTION_FONT_PLAIN)
 
+# The poster title font (Comic Sans Bold) covers Latin and Cyrillic, so all
+# European site languages and Turkish. Chinese and Arabic titles need a font
+# with those scripts: Microsoft YaHei Bold and Arial Bold on Windows.
+TITLE_FONT_CJK_PLAIN = _font("NICS_VIDEO_TITLE_FONT_CJK", "msyhbd.ttc",
+                             "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
+TITLE_FONT_ARABIC_PLAIN = _font("NICS_VIDEO_TITLE_FONT_ARABIC", "arialbd.ttf",
+                                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
+
+
+def has_arabic(text):
+    return any("\u0600" <= ch <= "\u06ff" or "\ufb50" <= ch <= "\ufeff" for ch in text or "")
+
+
+def title_font_for(text):
+    """Title font path (PIL form) that has the glyphs of this title's script."""
+    text = text or ""
+    if any("\u3040" <= ch <= "\u30ff" or "\u3400" <= ch <= "\u9fff" or "\uac00" <= ch <= "\ud7af" for ch in text):
+        return TITLE_FONT_CJK_PLAIN
+    if has_arabic(text):
+        return TITLE_FONT_ARABIC_PLAIN
+    return TITLE_FONT_PLAIN
+
 SUPPORTED_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".m4v", ".3gp"}
 
 for _d in (INPUT_DIR, OUTPUT_DIR, ASSETS_DIR, JOBS_DIR, ANALYSIS_DIR, MODELS_DIR, LOGS_DIR):
