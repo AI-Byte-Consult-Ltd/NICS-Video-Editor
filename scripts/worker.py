@@ -129,6 +129,7 @@ def handle(job):
             long_duration=float(job.get("long_duration") or 90),
             short_duration=float(job.get("short_duration") or 30),
             progress=lambda stage: call("progress", job_id=job_id, stage=stage),
+            watermark=bool(job.get("watermark")),
         )
 
         call("progress", job_id=job_id, stage="upload")

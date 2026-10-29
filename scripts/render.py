@@ -313,7 +313,8 @@ def _prepare_music_track(music_file, start, job_id):
 
 
 def render(plan, music_file=None, music_start=0.0, output_path=None, burn_captions=True,
-           title_text=None, title_subtitle=None, title_duration=2.5, stabilize=True):
+           title_text=None, title_subtitle=None, title_duration=2.5, stabilize=True,
+           watermark_text=None):
     width, height = plan["resolution"]
     timeline = plan["timeline"]
     if not timeline:
@@ -424,6 +425,21 @@ def render(plan, music_file=None, music_start=0.0, output_path=None, burn_captio
         video_with_text = _draw_title_card(
             filter_parts, video_with_text, width, height, title_text, title_subtitle, title_duration
         )
+
+    if watermark_text:
+        # Small signature with the site address on packages made with the free
+        # credits (approved 2026-10-29; paid plans render without it). Top
+        # right on vertical video, where Shorts/Reels/TikTok put no buttons
+        # in the corner; bottom right on horizontal video.
+        wm_size = max(14, round(min(width, height) * 0.028))
+        margin_x = round(width * 0.04)
+        wm_y = f"{round(height * 0.05)}" if height > width else f"h-text_h-{round(height * 0.05)}"
+        filter_parts.append(
+            f"[{video_with_text}]drawtext=fontfile='{CAPTION_FONT}':text='{_escape_drawtext(watermark_text)}':"
+            f"fontsize={wm_size}:fontcolor=white@0.8:borderw=2:bordercolor=black@0.5:"
+            f"x=w-text_w-{margin_x}:y={wm_y}[wm]"
+        )
+        video_with_text = "wm"
 
     filter_complex = ";".join(filter_parts)
 
