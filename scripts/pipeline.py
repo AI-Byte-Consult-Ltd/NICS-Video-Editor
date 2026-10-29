@@ -30,10 +30,15 @@ VARIANTS = [
 ]
 
 
+# Signature on packages made with the free credits ([26 VIDEO] sends
+# job.watermark = true for them); paid plans render without it.
+WATERMARK_TEXT = "NICS Video · aibyteconsult.com"
+
 def run_job(input_dir, output_dir, name, title=None, title_en=None, long_duration=90.0,
-            short_duration=30.0, music=None, progress=None):
+            short_duration=30.0, music=None, progress=None, watermark=False):
     """Returns the list of produced file paths. `progress(stage)` is called
-    with one of: analyze, plan, render_long, render_shorts, covers."""
+    with one of: analyze, plan, render_long, render_shorts, covers.
+    `watermark` adds the small site signature (packages from free credits)."""
     def report(stage):
         if progress:
             progress(stage)
@@ -64,6 +69,7 @@ def run_job(input_dir, output_dir, name, title=None, title_en=None, long_duratio
         info = render_mod.render(
             plan, music_file=music, burn_captions=False,
             output_path=os.path.join(output_dir, f"{name}_{suffix}.mp4"),
+            watermark_text=WATERMARK_TEXT if watermark else None,
         )
         outputs.append(info["output_path"])
 
